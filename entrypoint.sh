@@ -27,6 +27,7 @@ if [ -z "${SUBSPACE_HTTP_INSECURE-}" ] ; then
     export SUBSPACE_HTTP_INSECURE="false"
 fi
 
+export WG="wg0"
 export NAMESERVER=${NAMESERVER:-"8.8.8.8"}
 export DEBIAN_FRONTEND="noninteractive"
 
@@ -114,14 +115,14 @@ ListenPort = 51888
 WGSERVER
 cat /data/wireguard/peers/*.conf >>/data/wireguard/server.conf
 
-#if ip link show wg0 2>/dev/null; then
-#    ip link del wg0
-#fi
-#ip link add wg0 type wireguard
-#ip addr add 10.188.1.1/24 dev wg0
-#ip addr add fd00::10:188:1/112 dev wg0
-#wg setconf wg0 /data/wireguard/server.conf
-#ip link set wg0 up
+if ip link show ${WG} 2>/dev/null; then
+    ip link del ${WG}
+fi
+ip link add ${WG} type wireguard
+ip addr add 10.188.1.1/24 dev ${WG}
+ip addr add fd00::10:188:1/112 dev ${WG}
+wg setconf ${WG} /data/wireguard/server.conf
+ip link set ${WG} up
 
 # dnsmasq service
 if ! test -d /etc/sv/dnsmasq ; then
