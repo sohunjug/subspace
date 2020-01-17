@@ -8,7 +8,8 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN chmod +x /usr/bin/subspace /usr/local/bin/entrypoint.sh \
     && apt-get update \
-    && apt-get install -y iproute2 iptables dnsmasq socat
+    && apt-get install -y iproute2 iptables dnsmasq socat \
+    && rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
 
