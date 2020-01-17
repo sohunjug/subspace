@@ -27,55 +27,55 @@ if [ -z "${SUBSPACE_HTTP_INSECURE-}" ] ; then
     export SUBSPACE_HTTP_INSECURE="false"
 fi
 
-export NAMESERVER="1.1.1.1"
+export NAMESERVER="8.8.8.8"
 export DEBIAN_FRONTEND="noninteractive"
 
 # Set DNS server
 echo "nameserver ${NAMESERVER}" >/etc/resolv.conf
 
 # ipv4
-if ! /sbin/iptables -t nat --check POSTROUTING -s 10.99.97.0/24 -j MASQUERADE ; then
-    /sbin/iptables -t nat --append POSTROUTING -s 10.99.97.0/24 -j MASQUERADE
+if ! /sbin/iptables -t nat --check POSTROUTING -s 10.188.88.0/24 -j MASQUERADE ; then
+    /sbin/iptables -t nat --append POSTROUTING -s 10.188.88.0/24 -j MASQUERADE
 fi
 
 if ! /sbin/iptables --check FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT ; then
     /sbin/iptables --append FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
 fi
 
-if ! /sbin/iptables --check FORWARD -s 10.99.97.0/24 -j ACCEPT ; then
-    /sbin/iptables --append FORWARD -s 10.99.97.0/24 -j ACCEPT
+if ! /sbin/iptables --check FORWARD -s 10.188.88.0/24 -j ACCEPT ; then
+    /sbin/iptables --append FORWARD -s 10.188.88.0/24 -j ACCEPT
 fi
 
 # ipv6
-if ! /sbin/ip6tables -t nat --check POSTROUTING -s fd00::10:97:0/112 -j MASQUERADE ; then
-    /sbin/ip6tables -t nat --append POSTROUTING -s fd00::10:97:0/112 -j MASQUERADE
+if ! /sbin/ip6tables -t nat --check POSTROUTING -s fd00::10:188:0/112 -j MASQUERADE ; then
+    /sbin/ip6tables -t nat --append POSTROUTING -s fd00::10:188:0/112 -j MASQUERADE
 fi
 
 if ! /sbin/ip6tables --check FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT ; then
     /sbin/ip6tables --append FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
 fi
 
-if ! /sbin/ip6tables --check FORWARD -s fd00::10:97:0/112 -j ACCEPT ; then
-    /sbin/ip6tables --append FORWARD -s fd00::10:97:0/112 -j ACCEPT
+if ! /sbin/ip6tables --check FORWARD -s fd00::10:188:0/112 -j ACCEPT ; then
+    /sbin/ip6tables --append FORWARD -s fd00::10:188:0/112 -j ACCEPT
 fi
 
 
 # ipv4 - DNS Leak Protection
-if ! /sbin/iptables -t nat --check OUTPUT -s 10.99.97.0/16 -p udp --dport 53 -j DNAT --to 10.99.97.1:53 ; then
-    /sbin/iptables -t nat --append OUTPUT -s 10.99.97.0/16 -p udp --dport 53 -j DNAT --to 10.99.97.1:53
+if ! /sbin/iptables -t nat --check OUTPUT -s 10.188.0.0/16 -p udp --dport 53 -j DNAT --to 10.188.1.1:53 ; then
+    /sbin/iptables -t nat --append OUTPUT -s 10.188.0.0/16 -p udp --dport 53 -j DNAT --to 10.188.1.1:53
 fi
 
-if ! /sbin/iptables -t nat --check OUTPUT -s 10.99.97.0/16 -p tcp --dport 53 -j DNAT --to 10.99.97.1:53 ; then
-    /sbin/iptables -t nat --append OUTPUT -s 10.99.97.0/16 -p tcp --dport 53 -j DNAT --to 10.99.97.1:53
+if ! /sbin/iptables -t nat --check OUTPUT -s 10.188.0.0/16 -p tcp --dport 53 -j DNAT --to 10.188.1.1:53 ; then
+    /sbin/iptables -t nat --append OUTPUT -s 10.188.0.0/16 -p tcp --dport 53 -j DNAT --to 10.188.1.1:53
 fi
 
 # ipv6 - DNS Leak Protection
-if ! /sbin/ip6tables --wait -t nat --check OUTPUT -s fd00::10:97:0/112 -p udp --dport 53 -j DNAT --to fd00::10:97:1 ; then
-    /sbin/ip6tables --wait -t nat --append OUTPUT -s fd00::10:97:0/112 -p udp --dport 53 -j DNAT --to fd00::10:97:1
+if ! /sbin/ip6tables --wait -t nat --check OUTPUT -s fd00::10:188:0/112 -p udp --dport 53 -j DNAT --to fd00::10:188:1 ; then
+    /sbin/ip6tables --wait -t nat --append OUTPUT -s fd00::10:188:0/112 -p udp --dport 53 -j DNAT --to fd00::10:188:1
 fi
 
-if ! /sbin/ip6tables --wait -t nat --check OUTPUT -s fd00::10:97:0/112 -p tcp --dport 53 -j DNAT --to fd00::10:97:1 ; then
-    /sbin/ip6tables --wait -t nat --append OUTPUT -s fd00::10:97:0/112 -p tcp --dport 53 -j DNAT --to fd00::10:97:1
+if ! /sbin/ip6tables --wait -t nat --check OUTPUT -s fd00::10:188:0/112 -p tcp --dport 53 -j DNAT --to fd00::10:188:1 ; then
+    /sbin/ip6tables --wait -t nat --append OUTPUT -s fd00::10:188:0/112 -p tcp --dport 53 -j DNAT --to fd00::10:188:1
 fi
 
 # # Delete
@@ -118,8 +118,8 @@ if ip link show wg0 2>/dev/null; then
     ip link del wg0
 fi
 ip link add wg0 type wireguard
-ip addr add 10.99.97.1/24 dev wg0
-ip addr add fd00::10:97:1/112 dev wg0
+ip addr add 10.188.1.1/24 dev wg0
+ip addr add fd00::10:188:1/112 dev wg0
 wg setconf wg0 /data/wireguard/server.conf
 ip link set wg0 up
 
@@ -127,7 +127,7 @@ ip link set wg0 up
 if ! test -d /etc/sv/dnsmasq ; then
     cat <<DNSMASQ >/etc/dnsmasq.conf
     # Only listen on necessary addresses.
-    listen-address=127.0.0.1,10.99.97.1,fd00::10:97:1
+    listen-address=127.0.0.1,10.188.1.1,fd00::10:188:1
 
     # Never forward plain names (without a dot or domain part)
     domain-needed
