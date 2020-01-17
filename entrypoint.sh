@@ -27,7 +27,7 @@ if [ -z "${SUBSPACE_HTTP_INSECURE-}" ] ; then
     export SUBSPACE_HTTP_INSECURE="false"
 fi
 
-export NAMESERVER="8.8.8.8"
+export NAMESERVER=${NAMESERVER:-"8.8.8.8"}
 export DEBIAN_FRONTEND="noninteractive"
 
 # Set DNS server
@@ -79,19 +79,19 @@ if ! /sbin/ip6tables --wait -t nat --check OUTPUT -s fd00::10:188:0/112 -p tcp -
 fi
 
 # # Delete
-# /sbin/iptables -t nat --delete OUTPUT -s 10.99.97.0/16 -p udp --dport 53 -j DNAT --to 10.99.97.1:53
-# /sbin/iptables -t nat --delete OUTPUT -s 10.99.97.0/16 -p tcp --dport 53 -j DNAT --to 10.99.97.1:53
-# /sbin/ip6tables --wait -t nat --delete OUTPUT -s fd00::10:97:0/112 -p udp --dport 53 -j DNAT --to fd00::10:97:1
-# /sbin/ip6tables --wait -t nat --delete OUTPUT -s fd00::10:97:0/112 -p tcp --dport 53 -j DNAT --to fd00::10:97:1
-# /sbin/iptables -t nat --delete POSTROUTING -s 10.99.97.0/24 -j MASQUERADE
+# /sbin/iptables -t nat --delete OUTPUT -s 10.188.0.0/16 -p udp --dport 53 -j DNAT --to 10.188.88.1:53
+# /sbin/iptables -t nat --delete OUTPUT -s 10.188.0.0/16 -p tcp --dport 53 -j DNAT --to 10.188.88.1:53
+# /sbin/ip6tables --wait -t nat --delete OUTPUT -s fd00::10:188:0/112 -p udp --dport 53 -j DNAT --to fd00::10:188:1
+# /sbin/ip6tables --wait -t nat --delete OUTPUT -s fd00::10:188:0/112 -p tcp --dport 53 -j DNAT --to fd00::10:188:1
+# /sbin/iptables -t nat --delete POSTROUTING -s 10.188.88.0/24 -j MASQUERADE
 # /sbin/iptables --delete FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
-# /sbin/iptables --delete FORWARD -s 10.99.97.0/24 -j ACCEPT
-# /sbin/ip6tables -t nat --delete POSTROUTING -s fd00::10:97:0/112 -j MASQUERADE
+# /sbin/iptables --delete FORWARD -s 10.188.88.0/24 -j ACCEPT
+# /sbin/ip6tables -t nat --delete POSTROUTING -s fd00::10:188:0/112 -j MASQUERADE
 # /sbin/ip6tables --delete FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
-# /sbin/ip6tables --delete FORWARD -s fd00::10:97:0/112 -j ACCEPT
+# /sbin/ip6tables --delete FORWARD -s fd00::10:188:0/112 -j ACCEPT
 
 #
-# WireGuard (10.99.97.0/24)
+# WireGuard (10.188.88.0/24)
 #
 if ! test -d /data/wireguard ; then
     mkdir /data/wireguard
@@ -114,14 +114,14 @@ ListenPort = 51888
 WGSERVER
 cat /data/wireguard/peers/*.conf >>/data/wireguard/server.conf
 
-if ip link show wg0 2>/dev/null; then
-    ip link del wg0
-fi
-ip link add wg0 type wireguard
-ip addr add 10.188.1.1/24 dev wg0
-ip addr add fd00::10:188:1/112 dev wg0
-wg setconf wg0 /data/wireguard/server.conf
-ip link set wg0 up
+#if ip link show wg0 2>/dev/null; then
+#    ip link del wg0
+#fi
+#ip link add wg0 type wireguard
+#ip addr add 10.188.1.1/24 dev wg0
+#ip addr add fd00::10:188:1/112 dev wg0
+#wg setconf wg0 /data/wireguard/server.conf
+#ip link set wg0 up
 
 # dnsmasq service
 if ! test -d /etc/sv/dnsmasq ; then
