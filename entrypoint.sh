@@ -27,7 +27,7 @@ if [ -z "${SUBSPACE_HTTP_INSECURE-}" ] ; then
     export SUBSPACE_HTTP_INSECURE="false"
 fi
 
-export WG="wg0"
+export WG=${WG:-wg0}
 export NAMESERVER=${NAMESERVER:-"8.8.8.8"}
 export DEBIAN_FRONTEND="noninteractive"
 
