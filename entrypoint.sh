@@ -16,7 +16,7 @@ if [ -z "${SUBSPACE_BACKLINK-}" ] ; then
 fi
 
 if [ -z "${SUBSPACE_LETSENCRYPT-}" ] ; then
-    export SUBSPACE_LETSENCRYPT="true"
+    export SUBSPACE_LETSENCRYPT="false"
 fi
 
 if [ -z "${SUBSPACE_HTTP_ADDR-}" ] ; then
@@ -109,7 +109,7 @@ fi
 cat <<WGSERVER >/data/wireguard/server.conf
 [Interface]
 PrivateKey = $(cat /data/wireguard/server.private)
-ListenPort = 51820
+ListenPort = 51888
 
 WGSERVER
 cat /data/wireguard/peers/*.conf >>/data/wireguard/server.conf
